@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matchday - League Standings & Fixtures</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body>
+    
+    <!-- ====== HEADER ====== -->
+    <header class="site-header">
+        <h1 class="site-title">Matchday</h1>
+        <p class="site-tagline">Live standings and upcoming fixtures, straight from the source.</p>
+    </header>
+
+    <!-- ====== LEAGUE SELECTOR ====== -->
+     <section class="selector-section">
+        <form class="selector-form" action="{{ url_for('home') }}" method="GET">
+            <select name="competition" onchange="this.form.submit()">
+                {% for code, name in competitions.items() %}
+                <option value="{{ code }}" {% if code == selected_competition %}selected{% endif %}>{{ name }}</option>
+                {% endfor %}
+            </select>
+        </form>
+     </section>
+
+     <!-- ====== STANDINGS ====== -->
+     <section class="standings-section">
+        <h2 class="section-title">Standings</h2>
+        {% if standings %}
+        <table class="standings-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Team</th>
+                    <th>P</th>
+                    <th>W</th>
+                    <th>D</th>
+                    <th>L</th>
+                    <th>GD</th>
+                    <th>Pts</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for team in standings %}
+                <tr>
+                    <td>{{ team.position }}</td>
+                    <td class="team-call">
+                        <img src="{{ team.team.crest}}" class="team-crest" alt="" />
+                        {{ team.team.shortName }}
+                    </td>
+                    <td>{{ team.playedGames }}</td>
+                    <td>{{ team.won }}</td>
+                    <td>{{ team.draw }}</td>
+                    <td>{{ team.lost }}</td>
+                    <td>{{ team.goalDifference }}</td>
+                    <td class="points-call">{{ team.points }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p class="empty-state">No standings available for this competition right now.</p>
+        {% endif %}
+     </section>
+
+     <!-- ====== FIXTURES ====== -->
+      <section class="fixtures-section">
+        <h2 class="section-title">Upcoming Fixtures</h2>
+
+        {% if fixtures %}
+            <div class="fixtures-list">
+                {% for match in fixtures %}
+                    <div class="fixture-card">
+                        <div class="fixture-date">
+                        {{ match.utcDate[:10] }}
+                        </div>
+                        <div class="fixture-teams">
+                            <div class="team home-team">
+                                {% if match.homeTeam.crest %}
+                                    <img
+                                    src="{{ match.homeTeam.crest }}"
+                                    alt="{{ match.homeTeam.shortName }}"
+                                    >
+                                {% endif %}
+                                <span>{{ match.homeTeam.shortName }}</span>
+                            </div>
+                            <div class="vs">
+                                vs
+                            </div>
+                            <div class="team away-team">
+                                {% if match.awayTeam.crest %}
+                                    <img
+                                    src="{{ match.awayTeam.crest }}"
+                                    alt="{{ match.awayTeam.shortName }}"
+                                    >
+                                {% endif %}
+                                <span>{{ match.awayTeam.shortName }}</span>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="empty-state">No fixtures available.</p>
+        {% endif %}
+    </section>
+
+      <!-- ====== FOOTER ====== -->
+       <footer class="site-footer">
+        <p>Data provided by football-data.org</p>
+       </footer>
+       
+</body>
+</html>
